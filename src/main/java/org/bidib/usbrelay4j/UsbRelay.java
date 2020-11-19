@@ -22,6 +22,8 @@ public class UsbRelay {
 
     private HidDevice hidDevice;
 
+    private int numberOfRelays;
+
     private HidServices hidServices;
 
     public enum RelayState {
@@ -45,12 +47,24 @@ public class UsbRelay {
         // Open the device device by Vendor ID and Product ID with wildcard serial number
         HidDevice hidDevice = hidServices.getHidDevice(VENDOR_ID, PRODUCT_ID, SERIAL_NUMBER);
         if (hidDevice != null && hidDevice.getUsagePage() == 0xffffff00) {
-            // Device is already attached and successfully opened so send message
-            LOGGER.info("Found required interface on device...");
+            // Device is already attached and successfully opened so get the number of relays
+
+            LOGGER.info("Found required interface on device ...");
 
             this.hidDevice = hidDevice;
 
-            // sendMessage(hidDevice);
+            String product = hidDevice.getProduct();
+
+            LOGGER.info("Product: {}", product);
+
+            try {
+                numberOfRelays = Integer.parseInt(product.substring("USBRelay".length()));
+                LOGGER.info("Number of relays: {}", numberOfRelays);
+            }
+            catch (Exception ex) {
+                LOGGER.warn("Get the number of relays failed.", ex);
+                throw new RuntimeException("Get the number of relays failed.");
+            }
         }
         else {
             LOGGER.warn("Required device not found.");
@@ -64,6 +78,10 @@ public class UsbRelay {
 
             this.hidServices = null;
         }
+    }
+
+    public int getNumberOfRelays() {
+        return numberOfRelays;
     }
 
     public RelayState queryRelayState(int relayNumber) {

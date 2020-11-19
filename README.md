@@ -18,3 +18,6 @@ Based on the work of: https://github.com/darrylb123/usbrelay
 
 </dependencies>
 ```
+
+
+Uses ```hid4java``` : https://github.com/gary-rowe/hid4java
